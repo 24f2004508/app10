@@ -24,7 +24,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
 # Only allow your assigned origin + exam page origin
 allowed_origins = [
     "https://app-7tq7pw.example.com",
-    "https://exam.local"   # exam page origin
+    "https://exam.sanand.workers.dev"   # exam page origin
 ]
 
 app.add_middleware(
