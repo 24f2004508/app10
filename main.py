@@ -71,3 +71,4 @@ def ping(request: Request):
     # Echo the same ID back in the header with exact casing
     response.headers["X-Request-ID"] = request_id
     return response
+#middle update
