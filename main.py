@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 import uuid
 import time
@@ -15,16 +14,14 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         # Reuse inbound X-Request-ID or generate new UUID4
         request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
         request.state.request_id = request_id
+        # Do not set response header here — handled in endpoint
         response = await call_next(request)
-        # Always return request_id in response header
-        response.headers["X-Request-ID"] = request_id
         return response
 
 # === Middleware 2: Scoped CORS ===
-# Only allow your assigned origin + exam page origin
 allowed_origins = [
-    "https://app-7tq7pw.example.com",
-    "https://exam.sanand.workers.dev"   # exam page origin
+    "https://app-7tq7pw.example.com",      # your assigned origin
+    "https://exam.sanand.workers.dev"      # exam page origin
 ]
 
 app.add_middleware(
@@ -58,6 +55,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 app.add_middleware(RequestContextMiddleware)
 app.add_middleware(RateLimitMiddleware, limit=12, window=10)
 
+# === Endpoint: GET /ping ===
 @app.get("/ping")
 def ping(request: Request):
     # Reuse inbound X-Request-ID if present, otherwise generate new
@@ -70,7 +68,6 @@ def ping(request: Request):
             "request_id": request_id,
         }
     )
-    # Echo the same ID back in the header
+    # Echo the same ID back in the header with exact casing
     response.headers["X-Request-ID"] = request_id
     return response
-
