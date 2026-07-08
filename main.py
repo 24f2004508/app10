@@ -61,7 +61,11 @@ app.add_middleware(RateLimitMiddleware, limit=12, window=10)
 # === Endpoint: GET /ping ===
 @app.get("/ping")
 def ping(request: Request):
-    return {
-        "email": "24f2004508@ds.study.iitm.ac.in",  # your logged-in address
-        "request_id": request.state.request_id
-    }
+    response = JSONResponse(
+        content={
+            "email": "24f2004508@ds.study.iitm.ac.in",
+            "request_id": request.state.request_id,
+        }
+    )
+    response.headers["X-Request-ID"] = request.state.request_id
+    return response
